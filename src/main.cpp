@@ -5,7 +5,7 @@
 
 #define NUM_LEDS 60
 #define DATA_PIN 6
-#define COLOR_ORDER RGB
+#define COLOR_ORDER GRB
 
 static const uint8_t brightness = 100;
 CRGB leds[NUM_LEDS];
@@ -20,7 +20,7 @@ void setup() {
 
   while(!Serial) { }
 
-  FastLED.addLeds<WS2812B, DATA_PIN>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(brightness);
 
   encoder.begin();
