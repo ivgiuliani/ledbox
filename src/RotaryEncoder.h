@@ -60,18 +60,18 @@ class RotaryEncoder {
         0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0
       };
 
-      this->prev_next_code <<= 2;
-      this->prev_next_code |= digitalRead(this->dt_pin) ? 0x02 : 0x00;
-      this->prev_next_code |= digitalRead(this->clk_pin) ? 0x01 : 0x00;
-      this->prev_next_code &= 0x0f;
+      this->encoder_code <<= 2;
+      this->encoder_code |= digitalRead(this->dt_pin) ? 0x02 : 0x00;
+      this->encoder_code |= digitalRead(this->clk_pin) ? 0x01 : 0x00;
+      this->encoder_code &= 0x0f;
 
-      int8_t valid = rot_enc_table[(this->prev_next_code & 0x0f)];
+      int8_t valid = rot_enc_table[(this->encoder_code & 0x0f)];
 
       if (valid) {
-        this->store <<= 4;
-        this->store |= this->prev_next_code;
+        this->enc_buffer <<= 4;
+        this->enc_buffer |= this->encoder_code;
 
-        return decode_offset(this->store);
+        return decode_offset(this->enc_buffer);
       }
 
       return 0;
@@ -82,8 +82,8 @@ class RotaryEncoder {
     uint8_t dt_pin;
     uint8_t btn_pin;
 
-    uint8_t prev_next_code = 0;
-    uint16_t store = 0;
+    uint8_t encoder_code = 0;
+    uint16_t enc_buffer = 0;
 
     int8_t inline decode_offset(const int16_t st) {
       // Serial.print(this->store & 0xFF, HEX);
