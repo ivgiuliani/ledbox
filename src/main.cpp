@@ -53,7 +53,7 @@ void setup() {
 }
 
 static int16_t brightness = 0;
-void inc_brightness(int8_t brightness_offset) {
+void adjust_brightness(int8_t brightness_offset) {
   // Technically brightness is measured 0-255 and a uint8_t would
   // be enough. However we still use a int16_t as to avoid looping
   // within the range (e.g. jump from 255 to 0);
@@ -71,7 +71,7 @@ void loop() {
 
   int8_t offset = encoder.read_offset();
   if (offset != 0) {
-    inc_brightness(offset * LED_BRIGHTNESS_STEP_MULTIPLIER);
+    adjust_brightness(offset * LED_BRIGHTNESS_STEP_MULTIPLIER);
   }
 
   if (encoder_button.handle() == Click) {
