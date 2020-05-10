@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <FastLED.h>
+#include <buttonctrl.h>
 
 #include "RotaryEncoder.h"
 
@@ -11,6 +12,7 @@ static const uint8_t brightness = 100;
 CRGB leds[NUM_LEDS];
 
 RotaryEncoder encoder(D1, D2);
+ButtonCtrl encoder_button(D3);
 
 void setup() {
   delay(100);
@@ -24,6 +26,7 @@ void setup() {
   FastLED.setBrightness(brightness);
 
   encoder.begin();
+  encoder_button.begin(true);
   
   for(int i = 0; i < NUM_LEDS; i++) {
     leds[i] = CRGB::Black;
@@ -41,15 +44,30 @@ inline void fill_leds(uint8_t hue) {
 
 void loop() {
   static uint8_t brightness = 0;
+  static uint8_t color_idx = 0;
+
+  CRGB::HTMLColorCode colors[] = {
+    CRGB::White, CRGB::Red, CRGB::Green, CRGB::Blue
+  };
+
   FastLED.setBrightness(brightness);
 
   int8_t offset = encoder.read_offset();
   if (offset != 0) {
-    brightness += offset;
+    brightness += offset * 3;
     Serial.print("brightness: ");
     Serial.println(brightness);
   }
 
-  fill_leds(CRGB::White);
+  for(uint8_t i = 0; i < NUM_LEDS; i++) {
+    leds[i] = colors[color_idx];
+  }
+
+  // fill_leds(CRGB::White);
   FastLED.show();
+
+  if (encoder_button.handle() == Click) {
+    color_idx++;
+    color_idx %= 4;
+  }
 }
