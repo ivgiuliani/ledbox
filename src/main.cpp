@@ -56,7 +56,7 @@ static int16_t brightness = 0;
 void adjust_brightness(int8_t brightness_offset) {
   // Technically brightness is measured 0-255 and a uint8_t would
   // be enough. However we still use a int16_t as to avoid looping
-  // within the range (e.g. jump from 255 to 0);
+  // outside the range (e.g. jump from 255 to 0);
   brightness += brightness_offset;
   brightness = std::max(std::min(brightness, (int16_t)255), (int16_t)0);
 
