@@ -13,9 +13,28 @@ CRGB leds[NUM_LEDS];
 RotaryEncoder encoder(D1, D2);
 ButtonCtrl encoder_button(D3);
 
-void setup() {
-  delay(100);
+std::vector<CRGB> rotation_colors = {
+  CRGB::White,
+  CRGB::Red,
+  CRGB::Magenta,
+  CRGB::Orange, // Looks like yellow...
+  CRGB::Green,
+  CRGB::Cyan,
+  CRGB::Blue,
+};
 
+inline void fill_leds(CRGB color) {
+  Serial.print("set color(");
+  Serial.print(color.r, HEX); Serial.print(",");
+  Serial.print(color.g, HEX); Serial.print(",");
+  Serial.print(color.b, HEX);
+  Serial.println(")");
+  for(uint8_t i = 0; i < NUM_LEDS; i++) {
+    leds[i] = color;
+  }
+}
+
+void setup() {
   Serial.begin(9600);
   Serial.setTimeout(2000);
 
@@ -26,19 +45,11 @@ void setup() {
 
   encoder.begin();
   encoder_button.begin(true);
-  
-  for(int i = 0; i < NUM_LEDS; i++) {
-    leds[i] = CRGB::Black;
-  }
+
+  fill_leds(rotation_colors[0]);
 
   FastLED.show();
   Serial.println("OK.");
-}
-
-inline void fill_leds(uint8_t hue) {
-  for(uint8_t i = 0; i < NUM_LEDS; i++) {
-    leds[i].setHue(hue);
-  }
 }
 
 static int16_t brightness = 0;
@@ -58,24 +69,17 @@ void inc_brightness(int8_t brightness_offset) {
 void loop() {
   static uint8_t color_idx = 0;
 
-  CRGB::HTMLColorCode colors[] = {
-    CRGB::White, CRGB::Red, CRGB::Green, CRGB::Blue
-  };
-
   int8_t offset = encoder.read_offset();
   if (offset != 0) {
     inc_brightness(offset * LED_BRIGHTNESS_STEP_MULTIPLIER);
   }
 
-  for(uint8_t i = 0; i < NUM_LEDS; i++) {
-    leds[i] = colors[color_idx];
-  }
-
-  // fill_leds(CRGB::White);
-  FastLED.show();
-
   if (encoder_button.handle() == Click) {
     color_idx++;
-    color_idx %= 4;
+    color_idx %= rotation_colors.size();
+
+    fill_leds(rotation_colors[color_idx]);
   }
+
+  FastLED.show();
 }
