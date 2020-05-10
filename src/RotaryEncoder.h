@@ -10,7 +10,11 @@ class RotaryEncoder {
    * Decodes rotary encoder's input to avoid debounce effect. This
    * is based off a "valid input" table as described in:
    * https://www.best-microcontroller-projects.com/rotary-encoder.html
-   * (http://web.archive.org/web/20200430143612/https://www.best-microcontroller-projects.com/rotary-encoder.html)
+   * (http://web.archive.org/web/20200430143612/https://www.best-microcontroller-projects.com/rotary-encoder.html),
+   * however we also include noise mappings in the table here as to
+   * allow quick adjustments of the encoder (seems like there's no
+   * overlap between noise signals in CW and CCW which means we can
+   * do this with no trouble).
    */
   public:
     RotaryEncoder(const uint8_t clk_pin, const uint8_t dt_pin) {
@@ -28,14 +32,41 @@ class RotaryEncoder {
     }
 
     int8_t read_offset() {
+      /**
+       * MSB: most significant byte
+       * LSB: least significant byte
+       *            ____________            __________
+       *           |       ^    | ^      ^ |       ^
+       * MSB       |       ^    | ^      ^ |       ^
+       *      _____|       ^    |__________|       ^
+       *                  ___________            _____
+       *                 | ^      ^  |   ^      |  ^
+       * LSB             | ^      ^  |   ^      |  ^
+       *      ___________| ^      ^  |__________|  ^
+       *                  (11)   (10)   (00)      (01)
+       *
+       * There's only 8 possible ways we can move:
+       * 11->10, 10->00, 00->01 and 01->11 (similar counter-clockwise).
+       *
+       * The idea behind the rotary table is that you store the previous
+       * and current state and just return an offset (+/-1) when this
+       * combination ends up in a valid state. As there's plenty of noise
+       * in a rotary encoder, we also allow some "noise" values, extracted
+       * empirically during testing.
+       **/
+
       // A valid clockwise or counter-clockwise move returns 1, invalid returns 0.
       static const int8_t rot_enc_table[] = {
-        0,1,1,0,1,0,0,1,1,0,0,1,0,1,1,0
+        0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0
       };
 
       this->prev_next_code <<= 2;
-      if (digitalRead(this->dt_pin)) this->prev_next_code |= 0x02;
-      if (digitalRead(this->clk_pin)) this->prev_next_code |= 0x01;
+      if (digitalRead(this->dt_pin)) {
+        this->prev_next_code |= 0x02;
+      }
+      if (digitalRead(this->clk_pin)) {
+        this->prev_next_code |= 0x01;
+      }
       this->prev_next_code &= 0x0f;
 
       int8_t valid = rot_enc_table[(this->prev_next_code & 0x0f)];
