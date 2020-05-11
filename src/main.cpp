@@ -9,9 +9,9 @@
 #define DATA_PIN 4
 
 // Even though the max brightness value is 255 as far as FastLED
-// is concerned, we limit it to 190 as over this value the colors
+// is concerned, we limit it to 160 as over this value the colors
 // start losing accuracy (e.g. white leans towards a yellow).
-#define LED_MAX_BRIGHTNESS 190
+#define LED_MAX_BRIGHTNESS 160
 #define LED_BRIGHTNESS_STEP_MULTIPLIER 5
 
 CRGB leds[NUM_LEDS];
