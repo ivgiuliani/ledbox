@@ -30,6 +30,7 @@ std::vector<CRGB> rotation_colors = {
 
 struct {
   uint8_t color_idx = 0;
+  uint8_t brightness = 0;
 } current_state;
 
 inline void fill_leds(CRGB color) {
@@ -53,7 +54,7 @@ void setup() {
   encoder_button.begin(true);
 
   FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.setBrightness(0);
+  FastLED.setBrightness(current_state.brightness);
   fill_leds(CRGB::Black);
   FastLED.show();
   fill_leds(rotation_colors[0]);
@@ -61,19 +62,19 @@ void setup() {
   Serial.println("OK.");
 }
 
-static uint8_t brightness = 0;
 void set_brightness(uint8_t b) {
-  brightness = b;
+  current_state.brightness = b;
   FastLED.setBrightness(b);
   Serial.print("brightness: ");
-  Serial.println(brightness);
+  Serial.println(current_state.brightness);
 }
 
 void adjust_brightness(int8_t brightness_offset) {
   // Technically brightness is measured 0-255 and a uint8_t would
   // be enough. However we still use a int16_t as to avoid looping
   // outside the range (e.g. jump from 255 to 0);
-  int16_t b = brightness;
+  int16_t b = current_state.brightness;
+
   b += brightness_offset;
   b = std::max(std::min(b, (int16_t)LED_MAX_BRIGHTNESS), (int16_t)0);
 
