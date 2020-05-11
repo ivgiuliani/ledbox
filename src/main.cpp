@@ -7,6 +7,10 @@
 #define NUM_LEDS 60
 #define DATA_PIN 4
 
+// Even though the max brightness value is 255 as far as FastLED
+// is concerned, we limit it to 128 as over this value the colors
+// start losing accuracy (e.g. white leans towards a yellow).
+#define LED_MAX_BRIGHTNESS 128
 #define LED_BRIGHTNESS_STEP_MULTIPLIER 5
 
 CRGB leds[NUM_LEDS];
@@ -66,7 +70,7 @@ void adjust_brightness(int8_t brightness_offset) {
   // outside the range (e.g. jump from 255 to 0);
   int16_t b = brightness;
   b += brightness_offset;
-  b = std::max(std::min(b, (int16_t)255), (int16_t)0);
+  b = std::max(std::min(b, (int16_t)LED_MAX_BRIGHTNESS), (int16_t)0);
 
   set_brightness(b);
 }
