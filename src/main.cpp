@@ -40,15 +40,15 @@ void setup() {
 
   while(!Serial) { }
 
-  FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.setBrightness(0);
-
   encoder.begin();
   encoder_button.begin(true);
 
+  FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(0);
+  fill_leds(CRGB::Black);
+  FastLED.show();
   fill_leds(rotation_colors[0]);
 
-  FastLED.show();
   Serial.println("OK.");
 }
 
