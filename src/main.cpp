@@ -2,15 +2,16 @@
 #include <FastLED.h>
 #include <buttonctrl.h>
 
+#include "GammaCorrection.h"
 #include "RotaryEncoder.h"
 
 #define NUM_LEDS 60
 #define DATA_PIN 4
 
 // Even though the max brightness value is 255 as far as FastLED
-// is concerned, we limit it to 128 as over this value the colors
+// is concerned, we limit it to 190 as over this value the colors
 // start losing accuracy (e.g. white leans towards a yellow).
-#define LED_MAX_BRIGHTNESS 128
+#define LED_MAX_BRIGHTNESS 190
 #define LED_BRIGHTNESS_STEP_MULTIPLIER 5
 
 CRGB leds[NUM_LEDS];
@@ -18,14 +19,18 @@ RotaryEncoder encoder(D1, D2);
 ButtonCtrl encoder_button(D3, 1000, HIGH);
 
 std::vector<CRGB> rotation_colors = {
-  CRGB::White,
-  CRGB::Red,
-  CRGB::Magenta,
-  CRGB::Orange, // Looks like yellow but a tad better...
-  CRGB::Green,
-  CRGB::Cyan,
-  CRGB::Blue,
+  gc_rgb(CRGB::White),
+  gc_rgb(CRGB::Red),
+  gc_rgb(CRGB::Magenta),
+  gc_rgb(CRGB::Orange),
+  gc_rgb(CRGB::Green),
+  gc_rgb(CRGB::Cyan),
+  gc_rgb(CRGB::Blue),
 };
+
+struct {
+  uint8_t color_idx = 0;
+} current_state;
 
 inline void fill_leds(CRGB color) {
   Serial.print("set color(");
@@ -77,8 +82,6 @@ void adjust_brightness(int8_t brightness_offset) {
 
 
 void loop() {
-  static uint8_t color_idx = 0;
-
   int8_t offset = encoder.read_offset();
   if (offset != 0) {
     adjust_brightness(offset * LED_BRIGHTNESS_STEP_MULTIPLIER);
@@ -86,10 +89,10 @@ void loop() {
 
   const ButtonEvent btn_ev = encoder_button.handle();
   if (btn_ev == Click) {
-    color_idx++;
-    color_idx %= rotation_colors.size();
+    current_state.color_idx++;
+    current_state.color_idx %= rotation_colors.size();
 
-    fill_leds(rotation_colors[color_idx]);
+    fill_leds(rotation_colors[current_state.color_idx]);
   } else if (btn_ev == LongClick) {
     Serial.println("OFF");
     set_brightness(0);
