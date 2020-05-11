@@ -11,7 +11,7 @@
 
 CRGB leds[NUM_LEDS];
 RotaryEncoder encoder(D1, D2);
-ButtonCtrl encoder_button(D3, 1500, HIGH);
+ButtonCtrl encoder_button(D3, 1000, HIGH);
 
 std::vector<CRGB> rotation_colors = {
   CRGB::White,
