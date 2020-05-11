@@ -23,8 +23,8 @@ std::vector<CRGB> rotation_colors = {
   gc_rgb(CRGB::Red),
   gc_rgb(CRGB::Magenta),
   gc_rgb(CRGB::Orange),
-  gc_rgb(CRGB::Green),
-  gc_rgb(CRGB::Cyan),
+  gc_rgb(CRGB::Lime), // Actually green
+  gc_rgb(CRGB::DeepSkyBlue),
   gc_rgb(CRGB::Blue),
 };
 
