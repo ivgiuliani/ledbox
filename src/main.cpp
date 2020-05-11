@@ -5,19 +5,19 @@
 #include "RotaryEncoder.h"
 
 #define NUM_LEDS 60
-#define DATA_PIN 6
+#define DATA_PIN 4
 
 #define LED_BRIGHTNESS_STEP_MULTIPLIER 5
 
 CRGB leds[NUM_LEDS];
 RotaryEncoder encoder(D1, D2);
-ButtonCtrl encoder_button(D3);
+ButtonCtrl encoder_button(D3, 1500, HIGH);
 
 std::vector<CRGB> rotation_colors = {
   CRGB::White,
   CRGB::Red,
   CRGB::Magenta,
-  CRGB::Orange, // Looks like yellow...
+  CRGB::Orange, // Looks like yellow but a tad better...
   CRGB::Green,
   CRGB::Cyan,
   CRGB::Blue,
@@ -52,19 +52,25 @@ void setup() {
   Serial.println("OK.");
 }
 
-static int16_t brightness = 0;
+static uint8_t brightness = 0;
+void set_brightness(uint8_t b) {
+  brightness = b;
+  FastLED.setBrightness(b);
+  Serial.print("brightness: ");
+  Serial.println(brightness);
+}
+
 void adjust_brightness(int8_t brightness_offset) {
   // Technically brightness is measured 0-255 and a uint8_t would
   // be enough. However we still use a int16_t as to avoid looping
   // outside the range (e.g. jump from 255 to 0);
-  brightness += brightness_offset;
-  brightness = std::max(std::min(brightness, (int16_t)255), (int16_t)0);
+  int16_t b = brightness;
+  b += brightness_offset;
+  b = std::max(std::min(b, (int16_t)255), (int16_t)0);
 
-  FastLED.setBrightness(brightness);
-
-  Serial.print("brightness: ");
-  Serial.println(brightness);
+  set_brightness(b);
 }
+
 
 void loop() {
   static uint8_t color_idx = 0;
@@ -74,11 +80,15 @@ void loop() {
     adjust_brightness(offset * LED_BRIGHTNESS_STEP_MULTIPLIER);
   }
 
-  if (encoder_button.handle() == Click) {
+  const ButtonEvent btn_ev = encoder_button.handle();
+  if (btn_ev == Click) {
     color_idx++;
     color_idx %= rotation_colors.size();
 
     fill_leds(rotation_colors[color_idx]);
+  } else if (btn_ev == LongClick) {
+    Serial.println("OFF");
+    set_brightness(0);
   }
 
   FastLED.show();
