@@ -52,7 +52,8 @@ class RotaryEncoder {
        * and current state and just return an offset (+/-1) when this
        * combination ends up in a valid state. As there's plenty of noise
        * in a rotary encoder, we also allow some "noise" values, extracted
-       * empirically during testing.
+       * empirically during testing if these values only appear either when
+       * turning the encoder clockwise or counter-clockwise (but not both).
        **/
 
       // A valid clockwise or counter-clockwise move returns 1, invalid returns 0.
@@ -107,12 +108,19 @@ class RotaryEncoder {
         #endif
 
         /* Low precision variant */
+
+        // Codes that appear in both clockwise and counter-clockwise signals
+        // and therefore are just noise.
         case 0x18:
+        case 0x28:
         case 0x41:
         case 0x42:
         case 0x81:
+        case 0x7D:
         case 0x7E:
+        case 0x82:
         case 0xBD:
+        case 0xBE:
         case 0xE4:
           // most-significant byte, ignored in low precision mode
           return 0;
