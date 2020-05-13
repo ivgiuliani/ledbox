@@ -11,7 +11,7 @@
 
 LedManager<NUM_LEDS, DATA_PIN> led_manager;
 RotaryEncoder encoder(D1, D2);
-ButtonCtrl encoder_button(D3, 1000, HIGH);
+ButtonCtrl<D3, HIGH> encoder_button(1000);
 
 void setup() {
   Serial.begin(9600);
