@@ -131,6 +131,7 @@ class RotaryEncoder {
         case 0x71:
         case 0xE8:
         case 0xEB:
+        case 0xE7:
           return 1;
 
         // Counter-clockwise signals
@@ -138,6 +139,7 @@ class RotaryEncoder {
         case 0x4D:
         case 0xD4:
         case 0xD7:
+        case 0xDB:
         case 0x2B:
           return -1;
 
