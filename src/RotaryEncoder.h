@@ -3,6 +3,8 @@
 
 #include <Arduino.h>
 
+// Uncomment to enable high-precision matching. Works well enough only with
+// high-quality rotary encoders (i.e. of the magnetic kind).
 // #define ROTARY_ENABLE_HIGH_PRECISION
 
 class RotaryEncoder {
