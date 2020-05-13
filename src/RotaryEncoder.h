@@ -7,14 +7,14 @@
 
 class RotaryEncoder {
   /*
-   * Decodes rotary encoder's input to avoid debounce effect. This
-   * is based off a "valid input" table as described in:
+   * Decodes rotary encoder's input to avoid debounce effect. This is based off
+   * a "valid input" table as described in
    * https://www.best-microcontroller-projects.com/rotary-encoder.html
    * (http://web.archive.org/web/20200430143612/https://www.best-microcontroller-projects.com/rotary-encoder.html),
-   * however we also include noise mappings in the table here as to
-   * allow quick adjustments of the encoder (seems like there's no
-   * overlap between noise signals in CW and CCW which means we can
-   * do this with no trouble).
+   * however we also include noise mappings in the table here as to allow quick
+   * adjustments of the encoder (seems like there's no significant overlap
+   * between noise signals in CW and CCW which means we can do this with little
+   * trouble).
    */
   public:
     RotaryEncoder(const uint8_t clk_pin, const uint8_t dt_pin) {
