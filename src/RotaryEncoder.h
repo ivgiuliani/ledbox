@@ -129,6 +129,7 @@ class RotaryEncoder {
         case 0x14:
         case 0x17:
         case 0x71:
+        case 0x8E:
         case 0xE8:
         case 0xEB:
         case 0xE7:
@@ -141,6 +142,7 @@ class RotaryEncoder {
         case 0xD7:
         case 0xDB:
         case 0x2B:
+        case 0xB2:
           return -1;
 
         default:
