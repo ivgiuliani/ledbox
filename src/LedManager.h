@@ -95,32 +95,32 @@ class LedManager {
       // Assumes all leds have the same color
       CRGB curr = this->leds[0];
 
-      bool changed = true;
-      while (changed) {
-        const bool c1 = u8_blend_to_u8(curr.red,   target.red,   step_amount);
-        const bool c2 = u8_blend_to_u8(curr.green, target.green, step_amount);
-        const bool c3 = u8_blend_to_u8(curr.blue,  target.blue,  step_amount);
-        changed = c1 == true || c2 == true || c3 == true;
-
-        if (changed) {
-          fill_solid(curr);
-          FastLED.show();
-          FastLED.delay(1);
-        }
+      while (bool changed = crgb_blend_to_crgb(curr, target, step_amount)) {
+        fill_solid(curr);
+        FastLED.show();
+        FastLED.delay(1);
       }
     }
 
-    bool u8_blend_to_u8(uint8_t &cur, const uint8_t target, const uint8_t amount) {
-      const uint8_t delta = scale8_video(abs(target - cur), amount);
-
-      if (cur < target) {
-        cur += delta;
-      } else {
-        cur -= delta;
-      }
+    inline bool u8_blend_to_u8(uint8_t &curr,
+                               const uint8_t target,
+                               const uint8_t scale) {
+      const uint8_t delta = scale8_video(abs(target - curr), scale);
+      curr += curr < target ? delta : -delta;
 
       // Returns true when the value has changed.
       return delta != 0;
+    }
+
+    inline bool crgb_blend_to_crgb(CRGB &curr,
+                                   CRGB target,
+                                   const uint8_t scale) {
+      const bool c1 = u8_blend_to_u8(curr.red,   target.red,   scale);
+      const bool c2 = u8_blend_to_u8(curr.green, target.green, scale);
+      const bool c3 = u8_blend_to_u8(curr.blue,  target.blue,  scale);
+
+      // Returns true when the value has changed.
+      return c1 == true || c2 == true || c3 == true;
     }
 
 };
