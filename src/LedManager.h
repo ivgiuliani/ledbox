@@ -91,7 +91,7 @@ class LedManager {
       }
     }
 
-    void fade_to(const CRGB target, uint8_t step_amount = 35) {
+    void fade_to(const CRGB target, uint8_t step_amount = 75) {
       // Assumes all leds have the same color
       CRGB curr = this->leds[0];
 
