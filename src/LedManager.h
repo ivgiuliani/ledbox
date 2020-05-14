@@ -59,7 +59,7 @@ class LedManager {
       this->color_idx++;
       this->color_idx %= this->rotation_colors.size();
 
-      fill_solid(rotation_colors[this->color_idx]);
+      fade_to(rotation_colors[this->color_idx]);
     }
   
   private:
@@ -78,18 +78,51 @@ class LedManager {
       gc_rgb(CRGB::Blue),
     };
 
-  inline void fill_solid(CRGB color) {
-    if (ENABLE_SERIAL_PRINT) {
-      Serial.print("fill_solid(");
-      Serial.print(color.r, HEX); Serial.print(",");
-      Serial.print(color.g, HEX); Serial.print(",");
-      Serial.print(color.b, HEX);
-      Serial.println(")");
+    inline void fill_solid(CRGB color) {
+      if (ENABLE_SERIAL_PRINT) {
+        Serial.print("fill_solid(");
+        Serial.print(color.r, HEX); Serial.print(",");
+        Serial.print(color.g, HEX); Serial.print(",");
+        Serial.print(color.b, HEX);
+        Serial.println(")");
+      }
+      for(uint8_t i = 0; i < NUM_LEDS; i++) {
+        leds[i] = color;
+      }
     }
-    for(uint8_t i = 0; i < NUM_LEDS; i++) {
-      leds[i] = color;
+
+    void fade_to(const CRGB target, uint8_t step_amount = 35) {
+      // Assumes all leds have the same color
+      CRGB curr = this->leds[0];
+
+      bool changed = true;
+      while (changed) {
+        const bool c1 = u8_blend_to_u8(curr.red,   target.red,   step_amount);
+        const bool c2 = u8_blend_to_u8(curr.green, target.green, step_amount);
+        const bool c3 = u8_blend_to_u8(curr.blue,  target.blue,  step_amount);
+        changed = c1 == true || c2 == true || c3 == true;
+
+        if (changed) {
+          fill_solid(curr);
+          FastLED.show();
+          FastLED.delay(1);
+        }
+      }
     }
-  }
+
+    bool u8_blend_to_u8(uint8_t &cur, const uint8_t target, const uint8_t amount) {
+      const uint8_t delta = scale8_video(abs(target - cur), amount);
+
+      if (cur < target) {
+        cur += delta;
+      } else {
+        cur -= delta;
+      }
+
+      // Returns true when the value has changed.
+      return delta != 0;
+    }
+
 };
 
 #endif // __LED_MANAGER_H__
