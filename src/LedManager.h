@@ -70,8 +70,8 @@ class LedManager {
 
     std::vector<CRGB> rotation_colors = {
       gc_rgb(CRGB::White),
-      gc_rgb(CRGB::Red),
       gc_rgb(CRGB::Magenta),
+      gc_rgb(CRGB::Red),
       gc_rgb(CRGB::Orange),
       gc_rgb(CRGB::Lime), // Actually green
       gc_rgb(CRGB::DeepSkyBlue),
