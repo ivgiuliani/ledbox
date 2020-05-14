@@ -7,6 +7,7 @@
 // high-quality rotary encoders (i.e. of the magnetic kind).
 // #define ROTARY_ENABLE_HIGH_PRECISION
 
+template <uint8_t CLK_PIN, uint8_t DT_PIN>
 class RotaryEncoder {
   /*
    * Decodes rotary encoder's input to avoid debounce effect. This is based off
@@ -19,16 +20,13 @@ class RotaryEncoder {
    * trouble).
    */
   public:
-    RotaryEncoder(const uint8_t clk_pin, const uint8_t dt_pin) {
-      this->clk_pin = clk_pin;
-      this->dt_pin = dt_pin;
-    }
+    RotaryEncoder() {}
 
     bool begin() {
-      pinMode(this->clk_pin, INPUT);
-      pinMode(this->clk_pin, INPUT_PULLUP);
-      pinMode(this->dt_pin, INPUT);
-      pinMode(this->dt_pin, INPUT_PULLUP);
+      pinMode(CLK_PIN, INPUT);
+      pinMode(CLK_PIN, INPUT_PULLUP);
+      pinMode(DT_PIN, INPUT);
+      pinMode(DT_PIN, INPUT_PULLUP);
 
       return true;
     }
@@ -64,8 +62,8 @@ class RotaryEncoder {
       };
 
       this->encoder_code <<= 2;
-      this->encoder_code |= digitalRead(this->dt_pin) ? 0x02 : 0x00;
-      this->encoder_code |= digitalRead(this->clk_pin) ? 0x01 : 0x00;
+      this->encoder_code |= digitalRead(DT_PIN) ? 0x02 : 0x00;
+      this->encoder_code |= digitalRead(CLK_PIN) ? 0x01 : 0x00;
       this->encoder_code &= 0x0f;
 
       int8_t valid = rot_enc_table[(this->encoder_code & 0x0f)];
@@ -81,10 +79,6 @@ class RotaryEncoder {
     }
 
   private:
-    uint8_t clk_pin;
-    uint8_t dt_pin;
-    uint8_t btn_pin;
-
     uint8_t encoder_code = 0;
     uint16_t enc_buffer = 0;
 
