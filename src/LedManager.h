@@ -68,7 +68,7 @@ class LedManager {
     uint8_t color_idx = 0;
     uint8_t brightness = 0;
 
-    std::vector<CRGB> rotation_colors = {
+    const std::vector<CRGB> rotation_colors = {
       gc_rgb(CRGB::White),
       gc_rgb(CRGB::Magenta),
       gc_rgb(CRGB::Red),
@@ -86,9 +86,7 @@ class LedManager {
         Serial.print(color.b, HEX);
         Serial.println(")");
       }
-      for(uint8_t i = 0; i < NUM_LEDS; i++) {
-        leds[i] = color;
-      }
+      std::fill_n(leds, NUM_LEDS, color);
     }
 
     void fade_to(const CRGB target, uint8_t step_amount = 75) {
