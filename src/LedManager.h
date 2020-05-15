@@ -62,6 +62,15 @@ public:
     fade_to(rotation_colors[this->color_idx]);
   }
 
+  void off() {
+    const CRGB curr = current_color();
+
+    fade_to(CRGB::Black, 50);
+    set_brightness(0);
+
+    fill_solid(curr);
+  }
+
 private:
   CRGB leds[NUM_LEDS];
 
@@ -78,6 +87,11 @@ private:
     gc_rgb(CRGB::Blue),
   };
 
+  inline CRGB current_color() {
+    // Assumes all leds share the same color
+    return leds[0];
+  }
+
   inline void fill_solid(CRGB color) {
     if (ENABLE_SERIAL_PRINT) {
       Serial.print("fill_solid(");
@@ -90,8 +104,7 @@ private:
   }
 
   void fade_to(const CRGB target, uint8_t step_amount = 75) {
-    // Assumes all leds have the same color
-    CRGB curr = this->leds[0];
+    CRGB curr = current_color();
 
     while (bool changed = crgb_blend_to_crgb(curr, target, step_amount)) {
       fill_solid(curr);
@@ -113,12 +126,12 @@ private:
   inline bool crgb_blend_to_crgb(CRGB &curr,
                                   CRGB target,
                                   const uint8_t scale) {
-    const bool c1 = u8_blend_to_u8(curr.red,   target.red,   scale);
-    const bool c2 = u8_blend_to_u8(curr.green, target.green, scale);
-    const bool c3 = u8_blend_to_u8(curr.blue,  target.blue,  scale);
+    const bool r = u8_blend_to_u8(curr.red,   target.red,   scale);
+    const bool g = u8_blend_to_u8(curr.green, target.green, scale);
+    const bool b = u8_blend_to_u8(curr.blue,  target.blue,  scale);
 
-    // Returns true when the value has changed.
-    return c1 == true || c2 == true || c3 == true;
+    // Returns true when any value has changed.
+    return r == true || g == true || b == true;
   }
 };
 

@@ -36,8 +36,7 @@ void loop() {
   if (btn_ev == Click) {
     led_manager.rotate_next_color();
   } else if (btn_ev == LongClick) {
-    Serial.println("OFF");
-    led_manager.set_brightness(0);
+    led_manager.off();
   }
 
   FastLED.show();
