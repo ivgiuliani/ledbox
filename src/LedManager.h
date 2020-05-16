@@ -5,11 +5,12 @@
 #include <FastLED.h>
 
 #include "GammaCorrection.h"
-         
-// Even though the max brightness value is 255 as far as FastLED
-// is concerned, we limit it to 160 by default as over this value
-// the colors start losing accuracy (e.g. white leans towards a yellow).
-#define DEFAULT_LED_MAX_BRIGHTNESS 160
+
+// The max brightness value is 255 as far as FastLED is concerned but it may
+// be necessary to lower the max brightness since after a certain threshold
+// colors start losing accuracy (also this can be used as an implicit power
+// limitation).
+#define DEFAULT_LED_MAX_BRIGHTNESS 255
 
 template<uint16_t NUM_LEDS,
          uint8_t DATA_PIN,
