@@ -19,7 +19,7 @@ template<uint16_t NUM_LEDS,
 class LedManager {
 public:
   LedManager() {
-    FastLED.addLeds<WS2812B, DATA_PIN, RGB_ORDER>(this->leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+    FastLED.addLeds<WS2812B, DATA_PIN, RGB_ORDER>(this->leds, NUM_LEDS).setCorrection(TypicalSMD5050);
   };
 
   void begin() {
