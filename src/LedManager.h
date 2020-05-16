@@ -96,15 +96,22 @@ private:
     return leds[0];
   }
 
-  inline void fill_solid(CRGB color) {
+  inline void fill_solid(const CRGB color, uint8_t first = 0, uint8_t count = NUM_LEDS) {
     if (ENABLE_SERIAL_PRINT) {
       Serial.print("fill_solid(");
       Serial.print(color.r, HEX); Serial.print(",");
       Serial.print(color.g, HEX); Serial.print(",");
-      Serial.print(color.b, HEX);
+      Serial.print(color.b, HEX); Serial.print(",");
+      Serial.print("first="); Serial.print(first); Serial.print(",");
+      Serial.print("count="); Serial.print(count);
       Serial.println(")");
     }
-    std::fill_n(leds, NUM_LEDS, color);
+
+    // Boundary checks: make sure we only fill ranges in 0..NUM_LEDS-1
+    first = first >= NUM_LEDS ? NUM_LEDS - 1 : first;
+    count = first + count > NUM_LEDS ? NUM_LEDS - first : count;
+
+    std::fill_n(&leds[first], count, color);
   }
 
   /**
