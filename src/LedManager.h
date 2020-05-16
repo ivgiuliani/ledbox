@@ -71,6 +71,10 @@ public:
     fill_solid(curr);
   }
 
+  void handle() {
+    FastLED.show();
+  }
+
 private:
   CRGB leds[NUM_LEDS];
 
@@ -103,6 +107,14 @@ private:
     std::fill_n(leds, NUM_LEDS, color);
   }
 
+  /**
+   * Fades to the target color. This is a blocking method, as such whilst
+   * it's possible to get a slower animation, all input/output signals are
+   * locked while the animation is taking place.
+   *
+   * @param step_amount how much to progress towards the target color for each step.
+   *        This value is expressed in 256ths, so for example 75 is ~30%.
+   */
   void fade_to(const CRGB target, uint8_t step_amount = 75) {
     CRGB curr = current_color();
 

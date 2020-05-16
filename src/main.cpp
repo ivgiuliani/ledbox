@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <FastLED.h>
 #include <buttonctrl.h>
 
 #include "LedManager.h"
@@ -39,5 +38,5 @@ void loop() {
     led_manager.off();
   }
 
-  FastLED.show();
+  led_manager.handle();
 }
