@@ -27,7 +27,7 @@ public:
 
     // Apply black during initialization and force a show and only after that
     // prepulate it with the correct first color as tp avoid a "blink" from
-    // the strip.
+    // the strip when it's first powered up.
     fill_solid(CRGB::Black);
     FastLED.show();
 
