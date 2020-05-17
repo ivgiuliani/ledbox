@@ -35,7 +35,7 @@ void loop() {
   if (btn_ev == Click) {
     led_manager.click();
   } else if (btn_ev == LongClick) {
-    led_manager.off();
+    led_manager.next_effect();
   }
 
   led_manager.handle();

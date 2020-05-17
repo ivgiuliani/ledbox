@@ -104,4 +104,28 @@ private:
   uint8_t hue = 0;
 };
 
+enum AnimEffect {
+  Initial = -1,
+
+  Solid = 0,
+  Hue = 1,
+};
+
+extern LedAnim* make_effect(int8_t effect) {
+  switch(effect) {
+    case AnimEffect::Initial:
+      return new InitialAnim();
+    case AnimEffect::Solid:
+      return new SolidAnim();
+    case AnimEffect::Hue:
+      return new HueAnim();
+    default:
+      #ifdef ENABLE_SERIAL_DEBUG
+        Serial.print("Attempted to create invalid effect: ");
+        Serial.println(effect);
+      #endif
+      return NULL;
+  }
+}
+
 #endif // __LED_ANIM_H__

@@ -22,7 +22,7 @@ public:
   LedManager() {
     FastLED.addLeds<WS2812B, DATA_PIN, RGB_ORDER>(this->leds, NUM_LEDS).setCorrection(TypicalSMD5050);
 
-    swap_animation(new InitialAnim());
+    swap_animation(AnimEffect::Initial);
   };
 
   void begin() {
@@ -32,7 +32,7 @@ public:
     // show so to avoid a "blink" from the strip when it's first powered up.
     FastLED.show();
 
-    swap_animation(new SolidAnim());
+    swap_animation(AnimEffect::Solid);
   }
 
   void set_brightness(uint8_t b) {
@@ -61,10 +61,6 @@ public:
     current_animation->click();
   }
 
-  void off() {
-    set_brightness(0);
-  }
-
   void handle() {
     current_animation->handle();
 
@@ -75,12 +71,27 @@ public:
     }
   }
 
+  void next_effect() {
+    current_effect++;
+    if (current_effect >= 2) {
+      current_effect = 0;
+    }
+
+    swap_animation(current_effect);
+  }
+
 private:
+  CRGB leds[NUM_LEDS];
   LedControl control = LedControl(leds, NUM_LEDS);
   LedAnim *current_animation;
-  CRGB leds[NUM_LEDS];
+
+  int8_t current_effect = AnimEffect::Initial;
 
   uint8_t brightness = 0;
+
+  void swap_animation(int8_t effect) {
+    swap_animation(make_effect(effect));
+  }
 
   void swap_animation(LedAnim *anim) {
     #ifdef ENABLE_SERIAL_DEBUG
