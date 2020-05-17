@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <FastLED.h>
 
+#include "LedControl.h"
 #include "GammaCorrection.h"
 
 // The max brightness value is 255 as far as FastLED is concerned but it may
@@ -28,10 +29,10 @@ public:
     // Apply black during initialization and force a show and only after that
     // prepulate it with the correct first color as tp avoid a "blink" from
     // the strip when it's first powered up.
-    fill_solid(CRGB::Black);
+    control.fill_solid(CRGB::Black);
     FastLED.show();
 
-    fill_solid(rotation_colors[0]);
+    control.fill_solid(rotation_colors[0]);
   }
 
   void set_brightness(uint8_t b) {
@@ -68,7 +69,7 @@ public:
     fade_to(CRGB::Black, 50);
     set_brightness(0);
 
-    fill_solid(curr);
+    control.fill_solid(curr);
   }
 
   void handle() {
@@ -76,6 +77,7 @@ public:
   }
 
 private:
+  LedControl control = LedControl(leds, NUM_LEDS);
   CRGB leds[NUM_LEDS];
 
   uint8_t color_idx = 0;
@@ -96,24 +98,6 @@ private:
     return leds[0];
   }
 
-  inline void fill_solid(const CRGB color, uint8_t first = 0, uint8_t count = NUM_LEDS) {
-    #ifdef ENABLE_SERIAL_DEBUG
-      Serial.print("fill_solid(");
-      Serial.print(color.r, HEX); Serial.print(",");
-      Serial.print(color.g, HEX); Serial.print(",");
-      Serial.print(color.b, HEX); Serial.print(",");
-      Serial.print("first="); Serial.print(first); Serial.print(",");
-      Serial.print("count="); Serial.print(count);
-      Serial.println(")");
-    #endif
-
-    // Boundary checks: make sure we only fill ranges in 0..NUM_LEDS-1
-    first = first >= NUM_LEDS ? NUM_LEDS - 1 : first;
-    count = first + count > NUM_LEDS ? NUM_LEDS - first : count;
-
-    std::fill_n(&leds[first], count, color);
-  }
-
   /**
    * Fades to the target color. This is a blocking method, as such whilst
    * it's possible to get a slower animation, all input/output signals are
@@ -125,32 +109,11 @@ private:
   void fade_to(const CRGB target, uint8_t step_amount = 75) {
     CRGB curr = current_color();
 
-    while (bool changed = crgb_blend_to_crgb(curr, target, step_amount)) {
-      fill_solid(curr);
+    while (bool changed = control.crgb_blend_to_crgb(curr, target, step_amount)) {
+      control.fill_solid(curr);
       FastLED.show();
       FastLED.delay(1);
     }
-  }
-
-  inline bool u8_blend_to_u8(uint8_t &curr,
-                             const uint8_t target,
-                             const uint8_t scale) {
-    const uint8_t delta = scale8_video(abs(target - curr), scale);
-    curr += curr < target ? delta : -delta;
-
-    // Returns true when the value has changed.
-    return delta != 0;
-  }
-
-  inline bool crgb_blend_to_crgb(CRGB &curr,
-                                  CRGB target,
-                                  const uint8_t scale) {
-    const bool r = u8_blend_to_u8(curr.red,   target.red,   scale);
-    const bool g = u8_blend_to_u8(curr.green, target.green, scale);
-    const bool b = u8_blend_to_u8(curr.blue,  target.blue,  scale);
-
-    // Returns true when any value has changed.
-    return r == true || g == true || b == true;
   }
 };
 
