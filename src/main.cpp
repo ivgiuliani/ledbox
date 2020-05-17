@@ -26,9 +26,23 @@ void setup() {
 }
 
 void loop() {
+  static long last_brightness_0_ms = -1;
+
   const int8_t offset = encoder.read_offset();
   if (offset != 0) {
-    led_manager.adjust_brightness(offset * LED_BRIGHTNESS_STEP_MULTIPLIER);
+    LedControl *led_control = led_manager.get_control();
+
+    if (led_control->get_brightness() != 0 || millis() - last_brightness_0_ms >= 100) {
+      // When the brightness gets to 0 keep it at that and ignore further rotary
+      // encoder updates for up to 100ms. This is a workaround on a 'debounce'
+      // effect on the rotary encoder, where it can sometimes read noise values
+      // when turned too fast and bounce back to positive even though it's been
+      // turning counter clockwise.
+      led_control->adjust_brightness(offset * LED_BRIGHTNESS_STEP_MULTIPLIER);
+      if (led_control->get_brightness() == 0) {
+        last_brightness_0_ms = millis();
+      }
+    }
   }
 
   const ButtonEvent btn_ev = encoder_button.handle();

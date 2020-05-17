@@ -28,8 +28,8 @@ public:
     swap_animation(AnimEffect::Solid);
   }
 
-  void adjust_brightness(int8_t brightness_offset) {
-    control.adjust_brightness(brightness_offset);
+  LedControl *get_control() {
+    return &control;
   }
 
   void click() {
