@@ -33,7 +33,7 @@ void loop() {
 
   const ButtonEvent btn_ev = encoder_button.handle();
   if (btn_ev == Click) {
-    led_manager.rotate_next_color();
+    led_manager.click();
   } else if (btn_ev == LongClick) {
     led_manager.off();
   }

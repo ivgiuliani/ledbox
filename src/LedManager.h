@@ -5,7 +5,7 @@
 #include <FastLED.h>
 
 #include "LedControl.h"
-#include "GammaCorrection.h"
+#include "LedAnim.h"
 
 // The max brightness value is 255 as far as FastLED is concerned but it may
 // be necessary to lower the max brightness since after a certain threshold
@@ -21,26 +21,27 @@ class LedManager {
 public:
   LedManager() {
     FastLED.addLeds<WS2812B, DATA_PIN, RGB_ORDER>(this->leds, NUM_LEDS).setCorrection(TypicalSMD5050);
+
+    swap_animation(new InitialAnim());
   };
 
   void begin() {
     set_brightness(0);
 
-    // Apply black during initialization and force a show and only after that
-    // prepulate it with the correct first color as tp avoid a "blink" from
-    // the strip when it's first powered up.
-    control.fill_solid(CRGB::Black);
+    // The initial animation will have populated ever led with 'black'. Force a
+    // show so to avoid a "blink" from the strip when it's first powered up.
     FastLED.show();
 
-    control.fill_solid(rotation_colors[0]);
+    swap_animation(new SolidAnim());
   }
 
   void set_brightness(uint8_t b) {
     this->brightness = b;
     FastLED.setBrightness(b);
     #ifdef ENABLE_SERIAL_DEBUG
-      Serial.print("brightness: ");
-      Serial.println(this->brightness);
+      Serial.print("set_brightness(");
+      Serial.print(this->brightness);
+      Serial.println(")");
     #endif
   }
 
@@ -56,63 +57,47 @@ public:
     set_brightness(b);
   }
 
-  void rotate_next_color() {
-    this->color_idx++;
-    this->color_idx %= this->rotation_colors.size();
-
-    fade_to(rotation_colors[this->color_idx]);
+  void click() {
+    current_animation->click();
   }
 
   void off() {
-    const CRGB curr = current_color();
-
-    fade_to(CRGB::Black, 50);
     set_brightness(0);
-
-    control.fill_solid(curr);
   }
 
   void handle() {
-    FastLED.show();
+    current_animation->handle();
+
+    // rendering a frame every 16ms is roughly equivalent to 60fps
+    EVERY_N_MILLIS(16) {
+      current_animation->draw();
+      FastLED.show();
+    }
   }
 
 private:
   LedControl control = LedControl(leds, NUM_LEDS);
+  LedAnim *current_animation;
   CRGB leds[NUM_LEDS];
 
-  uint8_t color_idx = 0;
   uint8_t brightness = 0;
 
-  const std::vector<CRGB> rotation_colors = {
-    gc_rgb(CRGB::White),
-    gc_rgb(CRGB::Magenta),
-    gc_rgb(CRGB::Red),
-    gc_rgb(CRGB::Orange),
-    gc_rgb(CRGB::Lime), // Actually green
-    gc_rgb(CRGB::DeepSkyBlue),
-    gc_rgb(CRGB::Blue),
-  };
+  void swap_animation(LedAnim *anim) {
+    #ifdef ENABLE_SERIAL_DEBUG
+      Serial.print("swap_animation(");
+      Serial.print(anim->name());
+      Serial.println(")");
+    #endif
+    const LedAnim *old_anim = current_animation;
+    if (current_animation != NULL) {
+      current_animation->end();
+    }
 
-  inline CRGB current_color() {
-    // Assumes all leds share the same color
-    return leds[0];
-  }
+    current_animation = anim;
+    current_animation->begin(&control);
 
-  /**
-   * Fades to the target color. This is a blocking method, as such whilst
-   * it's possible to get a slower animation, all input/output signals are
-   * locked while the animation is taking place.
-   *
-   * @param step_amount how much to progress towards the target color for each step.
-   *        This value is expressed in 256ths, so for example 75 is ~30%.
-   */
-  void fade_to(const CRGB target, uint8_t step_amount = 75) {
-    CRGB curr = current_color();
-
-    while (bool changed = control.crgb_blend_to_crgb(curr, target, step_amount)) {
-      control.fill_solid(curr);
-      FastLED.show();
-      FastLED.delay(1);
+    if (old_anim != NULL) {
+      delete old_anim;
     }
   }
 };
