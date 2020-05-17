@@ -15,7 +15,7 @@ public:
   virtual void begin(LedControl *control) { this->control = control; }
   virtual void end() {}
   virtual void click() {}
-  virtual void handle() {}
+  virtual void loop() {}
   virtual void draw() {}
   virtual const char *name() = 0;
 
@@ -56,7 +56,7 @@ public:
     target_color = rotation_colors[color_idx];
   }
 
-  void handle() {
+  void loop() {
     if (current_color == target_color) {
       return;
     }
@@ -92,7 +92,7 @@ public:
     hue = 0;
   }
 
-  void handle() {
+  void loop() {
     EVERY_N_MILLISECONDS(100) {
       hue++;
       const CRGB c = CHSV(hue, 255, 255);

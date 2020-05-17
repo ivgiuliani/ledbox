@@ -62,7 +62,7 @@ public:
   }
 
   void handle() {
-    current_animation->handle();
+    current_animation->loop();
 
     // rendering a frame every 16ms is roughly equivalent to 60fps
     EVERY_N_MILLIS(16) {
