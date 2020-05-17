@@ -7,15 +7,8 @@
 #include "LedControl.h"
 #include "LedAnim.h"
 
-// The max brightness value is 255 as far as FastLED is concerned but it may
-// be necessary to lower the max brightness since after a certain threshold
-// colors start losing accuracy (also this can be used as an implicit power
-// limitation).
-#define DEFAULT_LED_MAX_BRIGHTNESS 255
-
 template<uint16_t NUM_LEDS,
          uint8_t DATA_PIN,
-         int16_t LED_MAX_BRIGHTNESS = DEFAULT_LED_MAX_BRIGHTNESS,
          EOrder RGB_ORDER = GRB>
 class LedManager {
 public:
@@ -26,7 +19,7 @@ public:
   };
 
   void begin() {
-    set_brightness(0);
+    control.set_brightness(0);
 
     // The initial animation will have populated ever led with 'black'. Force a
     // show so to avoid a "blink" from the strip when it's first powered up.
@@ -35,26 +28,8 @@ public:
     swap_animation(AnimEffect::Solid);
   }
 
-  void set_brightness(uint8_t b) {
-    this->brightness = b;
-    FastLED.setBrightness(b);
-    #ifdef ENABLE_SERIAL_DEBUG
-      Serial.print("set_brightness(");
-      Serial.print(this->brightness);
-      Serial.println(")");
-    #endif
-  }
-
   void adjust_brightness(int8_t brightness_offset) {
-    // Technically brightness is measured 0-255 and a uint8_t would
-    // be enough. However we still use a int16_t as to avoid looping
-    // outside the range (e.g. jump from 255 to 0);
-    int16_t b = this->brightness;
-
-    b += brightness_offset;
-    b = std::max(std::min(b, (int16_t)LED_MAX_BRIGHTNESS), (int16_t)0);
-
-    set_brightness(b);
+    control.adjust_brightness(brightness_offset);
   }
 
   void click() {

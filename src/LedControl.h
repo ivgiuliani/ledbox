@@ -4,6 +4,12 @@
 #include <Arduino.h>
 #include <FastLED.h>
 
+// The max brightness value is 255 as far as FastLED is concerned but it may
+// be necessary to lower the max brightness since after a certain threshold
+// colors start losing accuracy (also this can be used as an implicit power
+// limitation).
+#define LED_MAX_BRIGHTNESS 255
+
 /**
  * Collection of methods to control leds and ranges of leds
  */
@@ -11,6 +17,32 @@ class LedControl {
 public:
   LedControl(CRGB leds[], const uint16_t num_leds) :
     leds(leds), num_leds(num_leds) {}
+
+  void set_brightness(uint8_t brightness) {
+    this->brightness = brightness;
+    FastLED.setBrightness(brightness);
+    #ifdef ENABLE_SERIAL_DEBUG
+      Serial.print("set_brightness(");
+      Serial.print(this->brightness);
+      Serial.println(")");
+    #endif
+  }
+
+  void adjust_brightness(int8_t brightness_offset) {
+    // Technically brightness is measured 0-255 and a uint8_t would
+    // be enough. However we still use a int16_t as to avoid looping
+    // outside the range (e.g. jump from 255 to 0);
+    int16_t b = this->brightness;
+
+    b += brightness_offset;
+    b = std::max(std::min(b, (int16_t)LED_MAX_BRIGHTNESS), (int16_t)0);
+
+    set_brightness(b);
+  }
+
+  uint8_t get_brightness() {
+    return brightness;
+  }
 
   /**
    * A more flexible version of the fill_solid method that FastLED provides
@@ -60,6 +92,7 @@ public:
 private:
   CRGB *leds;
   const uint16_t num_leds;
+  uint8_t brightness = 0;
 };
 
 #endif // __LED_CONTROL_H__
