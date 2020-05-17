@@ -43,21 +43,36 @@ public:
   void begin(LedControl *control) {
     LedAnim::begin(control);
 
-    this->color_idx = 0;
-    control->fill_solid(rotation_colors[color_idx]);
+    color_idx = 0;
+    current_color = rotation_colors[color_idx];
+    target_color = rotation_colors[color_idx];
+
+    control->fill_solid(current_color);
   }
 
   void click() {
     this->color_idx++;
     this->color_idx %= rotation_colors.size();
+    target_color = rotation_colors[color_idx];
+  }
 
-    control->fill_solid(rotation_colors[color_idx]);
+  void handle() {
+    if (current_color == target_color) {
+      return;
+    }
+
+    const bool changed = control->crgb_blend_to_crgb(current_color, target_color, 75);
+    if (changed) {
+      control->fill_solid(current_color);
+    }
   }
 
   void draw() {}
 
 private:
   uint8_t color_idx = 0;
+  CRGB target_color;
+  CRGB current_color;
 
   const std::vector<CRGB> rotation_colors = {
     gc_rgb(CRGB::White),
