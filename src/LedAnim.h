@@ -67,8 +67,6 @@ public:
     }
   }
 
-  void draw() {}
-
 private:
   uint8_t color_idx = 0;
   CRGB target_color;
@@ -83,6 +81,27 @@ private:
     gc_rgb(CRGB::DeepSkyBlue),
     gc_rgb(CRGB::Blue),
   };
+};
+
+class HueAnim : public LedAnim {
+public:
+  const char *name() { return "hue"; }
+
+  void begin(LedControl *control) {
+    LedAnim::begin(control);
+    hue = 0;
+  }
+
+  void handle() {
+    EVERY_N_MILLISECONDS(100) {
+      hue++;
+      const CRGB c = CHSV(hue, 255, 255);
+      control->fill_solid(c);
+    }
+  }
+
+private:
+  uint8_t hue = 0;
 };
 
 #endif // __LED_ANIM_H__
