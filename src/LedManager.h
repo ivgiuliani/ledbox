@@ -15,8 +15,7 @@
 template<uint16_t NUM_LEDS,
          uint8_t DATA_PIN,
          int16_t LED_MAX_BRIGHTNESS = DEFAULT_LED_MAX_BRIGHTNESS,
-         EOrder RGB_ORDER = GRB,
-         bool ENABLE_SERIAL_PRINT = true>
+         EOrder RGB_ORDER = GRB>
 class LedManager {
 public:
   LedManager() {
@@ -38,10 +37,10 @@ public:
   void set_brightness(uint8_t b) {
     this->brightness = b;
     FastLED.setBrightness(b);
-    if (ENABLE_SERIAL_PRINT) {
+    #ifdef ENABLE_SERIAL_DEBUG
       Serial.print("brightness: ");
       Serial.println(this->brightness);
-    }
+    #endif
   }
 
   void adjust_brightness(int8_t brightness_offset) {
@@ -98,7 +97,7 @@ private:
   }
 
   inline void fill_solid(const CRGB color, uint8_t first = 0, uint8_t count = NUM_LEDS) {
-    if (ENABLE_SERIAL_PRINT) {
+    #ifdef ENABLE_SERIAL_DEBUG
       Serial.print("fill_solid(");
       Serial.print(color.r, HEX); Serial.print(",");
       Serial.print(color.g, HEX); Serial.print(",");
@@ -106,7 +105,7 @@ private:
       Serial.print("first="); Serial.print(first); Serial.print(",");
       Serial.print("count="); Serial.print(count);
       Serial.println(")");
-    }
+    #endif
 
     // Boundary checks: make sure we only fill ranges in 0..NUM_LEDS-1
     first = first >= NUM_LEDS ? NUM_LEDS - 1 : first;
