@@ -10,7 +10,7 @@
 
 LedManager<NUM_LEDS, DATA_PIN> led_manager;
 RotaryEncoder<D1, D2> encoder;
-ButtonCtrl<D3, HIGH> encoder_button(1000);
+ButtonCtrl<D3, INPUT_PULLUP, HIGH> encoder_button(1000);
 
 void setup() {
   Serial.begin(9600);
@@ -19,7 +19,7 @@ void setup() {
   while(!Serial) { }
 
   encoder.begin();
-  encoder_button.begin(true);
+  encoder_button.begin();
   led_manager.begin();
 
   Serial.println("OK.");
