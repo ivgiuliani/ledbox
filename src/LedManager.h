@@ -65,6 +65,7 @@ private:
   uint8_t brightness = 0;
 
   void swap_animation(int8_t effect) {
+    current_effect = effect;
     swap_animation(make_effect(effect));
   }
 
