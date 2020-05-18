@@ -93,7 +93,7 @@ public:
   }
 
   void loop() {
-    EVERY_N_MILLISECONDS(200) {
+    EVERY_N_MILLISECONDS(500) {
       hue++;
       const CRGB c = CHSV(hue, 255, 255);
       control->fill_solid(c);
