@@ -15,6 +15,9 @@
  */
 class LedControl {
 public:
+  CRGB *leds;
+  const uint16_t num_leds;
+
   LedControl(CRGB leds[], const uint16_t num_leds) :
     leds(leds), num_leds(num_leds) {}
 
@@ -90,8 +93,6 @@ public:
   }
 
 private:
-  CRGB *leds;
-  const uint16_t num_leds;
   uint8_t brightness = 0;
 };
 
