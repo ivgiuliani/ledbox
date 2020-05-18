@@ -54,15 +54,6 @@ public:
    */
   inline void fill_solid(const CRGB color, uint8_t first = 0, uint8_t count = -1) {
     if (count < 0) count = num_leds;
-    #ifdef ENABLE_SERIAL_DEBUG
-      Serial.print("fill_solid(");
-      Serial.print(color.r, HEX); Serial.print(",");
-      Serial.print(color.g, HEX); Serial.print(",");
-      Serial.print(color.b, HEX); Serial.print(",");
-      Serial.print("first="); Serial.print(first); Serial.print(",");
-      Serial.print("count="); Serial.print(count);
-      Serial.println(")");
-    #endif
 
     // Boundary checks: make sure we only fill ranges in 0..num_leds-1
     first = first >= num_leds ? num_leds - 1 : first;
