@@ -48,7 +48,7 @@ public:
 
   void next_effect() {
     current_effect++;
-    if (current_effect >= 2) {
+    if (current_effect >= 3) {
       current_effect = 0;
     }
 
