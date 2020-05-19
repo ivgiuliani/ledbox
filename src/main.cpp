@@ -2,6 +2,7 @@
 #include <buttonctrl.h>
 
 #include "LedManager.h"
+#include "LedWeb.h"
 #include "RotaryEncoder.h"
 
 #define NUM_LEDS 60
@@ -11,6 +12,7 @@
 LedManager<NUM_LEDS, DATA_PIN> led_manager;
 RotaryEncoder<D1, D2> encoder;
 ButtonCtrl<D3, HIGH, INPUT_PULLUP> encoder_button(1000);
+LedWeb led_web;
 
 void setup() {
   Serial.begin(9600);
@@ -21,6 +23,7 @@ void setup() {
   encoder.begin();
   encoder_button.begin();
   led_manager.begin();
+  led_web.begin();
 
   Serial.println("OK.");
 }
@@ -53,4 +56,5 @@ void loop() {
   }
 
   led_manager.handle();
+  led_web.handle();
 }

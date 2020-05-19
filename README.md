@@ -30,3 +30,6 @@ To upload it to the device:
 ```
 pio run --target upload
 ```
+
+Add a file named `wifi.txt` where the first line is the wifi's essid and the
+second line is the password.
