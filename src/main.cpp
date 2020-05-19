@@ -25,7 +25,7 @@ void setup() {
   led_manager.begin();
   led_web.begin();
 
-  Serial.println("OK.");
+  Serial.println(F("System start OK."));
 }
 
 void loop() {
