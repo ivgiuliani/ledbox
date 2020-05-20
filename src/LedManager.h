@@ -1,6 +1,8 @@
 #ifndef __LED_MANAGER_H__
 #define __LED_MANAGER_H__
 
+#define FASTLED_ESP8266_RAW_PIN_ORDER
+
 #include <Arduino.h>
 #include <FastLED.h>
 

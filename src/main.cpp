@@ -5,7 +5,7 @@
 #include "RotaryEncoder.h"
 
 #define NUM_LEDS 60
-#define DATA_PIN 4
+#define DATA_PIN D4 // GPIO2 aka D4
 #define LED_BRIGHTNESS_STEP_MULTIPLIER 5
 
 LedManager<NUM_LEDS, DATA_PIN> led_manager;
