@@ -6,6 +6,7 @@
 #include <ESP8266WebServer.h>
 
 #include "MicroUtil.h"
+#include "html/html.h"
 
 #define WIFI_HOSTNAME QUOTE(_WIFI_HOSTNAME)
 #ifndef _WIFI_SSID
@@ -31,11 +32,20 @@ public:
 
   void handle() {
     reset_wifi_if_not_connected();
+    if (!connected) return;
+
+    server->handleClient();
   }
 
+  void handle_main() {
+    server->send(200, "text/html", PAGE_MAIN);
+  }
 private:
   long last_connection_attempt = -1;
   bool connected = false;
+
+  ESP8266WebServer *server = nullptr;
+
 
   void wifi_setup(uint32_t delay_ms = 30000) {
     const uint32_t now = millis();
@@ -76,8 +86,15 @@ private:
             Serial.print("IP address: ");
             Serial.println(WiFi.localIP());
           #endif
-          // First valid connection, setup any new sockets here.
-          // TODO: setup web server
+
+          if (server != NULL) {
+            server->close();
+            delete server;
+          }
+
+          server = new ESP8266WebServer(80);
+          server->on("/main.html", HTTP_GET, std::bind(&LedWeb::handle_main, this));
+          server->begin();
         }
         connected = true;
         return;
