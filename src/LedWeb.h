@@ -215,7 +215,7 @@ private:
 
   void handle_brightness() {
     if (!doc["value"].is<int>()) {
-    serve_bad_request();
+      serve_bad_request();
       return;
     }
     uint8_t value = doc["value"] | 0;
