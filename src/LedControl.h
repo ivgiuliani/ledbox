@@ -47,6 +47,10 @@ public:
     return brightness;
   }
 
+  inline void commit() {
+    FastLED.show();
+  }
+
   /**
    * A more flexible version of the fill_solid method that FastLED provides
    * that allows to fill ranges of LEDs. By default, it will fill the whole

@@ -4,9 +4,11 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
+#include <ArduinoJson.h>
 
 #include "MicroUtil.h"
 #include "html/html.h"
+#include "LedControl.h"
 
 #define WIFI_HOSTNAME QUOTE(_WIFI_HOSTNAME)
 #ifndef _WIFI_SSID
@@ -22,11 +24,14 @@
 #  define WIFI_PASS QUOTE(_WIFI_PASS)
 #endif
 
+#define JSON_BUFFER_CAPACITY_BYTES 200
+
 class LedWeb {
 public:
   LedWeb() {};
 
-  void begin() {
+  void begin(LedControl *led_ctrl) {
+    this->led_ctrl = led_ctrl;
     wifi_setup();
   }
 
@@ -37,15 +42,46 @@ public:
     server->handleClient();
   }
 
-  void handle_main() {
-    server->send(200, "text/html", PAGE_MAIN);
+  void handle_request() {
+    #ifdef ENABLE_SERIAL_DEBUG
+      Serial.print("request uri: ");
+      Serial.println(server->uri());
+    #endif
+
+    switch(shash(server->uri().c_str())) {
+      case shash("/"):
+        serve_static(PAGE_MAIN);
+        break;
+      case shash("/api"):
+        // "plain" is a special argument in post request to access the raw body
+        if (server->hasArg("plain")) {
+          const String body = server->arg("plain");
+          DeserializationError err = deserializeJson(doc, body);
+          if (err) {
+            #ifdef ENABLE_SERIAL_DEBUG
+              Serial.print(F("JSON deserialization failed: "));
+              Serial.println(err.c_str());
+            #endif
+
+            serve_server_error();
+          }
+          handle_api_request();
+        }
+        serve_static("{ \"success\": true }", 200, "application/json");
+        break;
+      default:
+        serve_static("Not Found", 404);
+    }
+
   }
+
 private:
+  LedControl* led_ctrl = nullptr;
   long last_connection_attempt = -1;
   bool connected = false;
 
   ESP8266WebServer *server = nullptr;
-
+  DynamicJsonDocument doc = DynamicJsonDocument(JSON_BUFFER_CAPACITY_BYTES);
 
   void wifi_setup(uint32_t delay_ms = 30000) {
     const uint32_t now = millis();
@@ -93,7 +129,8 @@ private:
           }
 
           server = new ESP8266WebServer(80);
-          server->on("/main.html", HTTP_GET, std::bind(&LedWeb::handle_main, this));
+          server->on("/", HTTP_GET, std::bind(&LedWeb::handle_request, this));
+          server->on("/api", HTTP_POST, std::bind(&LedWeb::handle_request, this));
           server->begin();
         }
         connected = true;
@@ -103,6 +140,58 @@ private:
         // so that we lose compiler warnings.
         break;
     }
+  }
+
+  void serve_static(const char *content,
+                    int http_code = 200,
+                    const char *mime_type = "text/html") {
+    server->send(http_code, mime_type, content);
+  }
+
+  void serve_server_error() {
+    serve_static("Server Error", 500);
+  }
+
+  void serve_bad_request() {
+    serve_static("Bad Request", 400);
+  }
+
+  void handle_api_request() {
+    const char* op = doc["op"]; // e.g. "fill_solid"
+
+    switch(shash(op)) {
+      case shash("fill_solid"):
+        handle_fill_solid();
+        break;
+      case shash("set_brightness"):
+        if (!doc["value"].is<int>()) {
+          serve_bad_request();
+          return;
+        }
+        uint8_t value = doc["value"] | 0;
+        led_ctrl->set_brightness(value);
+        break;
+    }
+
+  }
+
+  void handle_fill_solid() {
+    const int range_start = doc["range_start"] | 0;
+    const int range_size = doc["range_size"] | led_ctrl->num_leds;
+
+    if (!doc["color"].is<JsonArray>() || doc["color"].as<JsonArray>().size() != 3) {
+      serve_bad_request();
+      return;
+    }
+
+    JsonArray color = doc["color"];
+    const uint8_t color_r = color[0];
+    const uint8_t color_g = color[1];
+    const uint8_t color_b = color[2];
+
+    const CRGB crgb = CRGB(color_r, color_g, color_b);
+    led_ctrl->fill_solid(crgb, range_start, range_size);
+    led_ctrl->commit();
   }
 };
 
