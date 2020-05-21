@@ -164,6 +164,9 @@ private:
       case shash("fill_solid"):
         handle_fill_solid();
         break;
+      case shash("status"):
+        handle_status();
+        break;
       case shash("reboot"):
         api_response_success();
         // wait 1 seconds before actually killing the system so that we
@@ -204,6 +207,25 @@ private:
     const CRGB crgb = CRGB(color_r, color_g, color_b);
     led_ctrl->fill_solid(crgb, range_start, range_size);
     led_ctrl->commit();
+  }
+
+  void handle_status() {
+    StaticJsonDocument<JSON_OBJECT_SIZE(2) + JSON_ARRAY_SIZE(60) + 60 * 8> response;
+    response["brightness"] = led_ctrl->get_brightness();
+    JsonArray leds = response.createNestedArray("leds");
+
+    for (int16_t i = 0; i < led_ctrl->num_leds; i++) {
+      const int32_t crgb =
+        (this->led_ctrl->leds[i].r << 16) +
+        (this->led_ctrl->leds[i].g << 8) +
+        this->led_ctrl->leds[i].b;
+      leds.add(String("#") + String(crgb, HEX));
+    }
+
+    String output;
+    serializeJson(response, output);
+
+    serve_static(output.c_str(), 200, "application/json");
   }
 };
 
