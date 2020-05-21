@@ -66,8 +66,9 @@ public:
             serve_server_error();
           }
           handle_api_request();
+        } else {
+          serve_bad_request();
         }
-        serve_static("{ \"success\": true }", 200, "application/json");
         break;
       default:
         serve_static("Not Found", 404);
@@ -164,6 +165,10 @@ private:
         handle_fill_solid();
         break;
       case shash("reboot"):
+        api_response_success();
+        // wait 1 seconds before actually killing the system so that we
+        // can serve the response
+        delay(1000);
         ESP.restart();
         break;
       case shash("set_brightness"):
@@ -173,8 +178,13 @@ private:
         }
         uint8_t value = doc["value"] | 0;
         led_ctrl->set_brightness(value);
+        api_response_success();
         break;
     }
+  }
+
+  inline void api_response_success() {
+    serve_static("{ \"success\": true }", 200, "application/json");
   }
 
   void handle_fill_solid() {
