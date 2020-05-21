@@ -209,6 +209,8 @@ private:
     const CRGB crgb = CRGB(color_r, color_g, color_b);
     led_ctrl->fill_solid(crgb, range_start, range_size);
     led_ctrl->commit();
+
+    api_response_success();
   }
 
   void handle_brightness() {
