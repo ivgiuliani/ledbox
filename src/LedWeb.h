@@ -163,6 +163,9 @@ private:
       case shash("fill_solid"):
         handle_fill_solid();
         break;
+      case shash("reboot"):
+        ESP.restart();
+        break;
       case shash("set_brightness"):
         if (!doc["value"].is<int>()) {
           serve_bad_request();
@@ -172,7 +175,6 @@ private:
         led_ctrl->set_brightness(value);
         break;
     }
-
   }
 
   void handle_fill_solid() {
