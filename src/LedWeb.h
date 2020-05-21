@@ -175,14 +175,14 @@ private:
         ESP.restart();
         break;
       case shash("set_brightness"):
-        if (!doc["value"].is<int>()) {
-          serve_bad_request();
-          return;
-        }
-        uint8_t value = doc["value"] | 0;
-        led_ctrl->set_brightness(value);
-        api_response_success();
+        handle_brightness();
         break;
+      default:
+        #ifdef ENABLE_SERIAL_DEBUG
+          Serial.print(F("Invalid op requested: "));
+          Serial.println(op);
+        #endif
+        serve_bad_request();
     }
   }
 
@@ -207,6 +207,16 @@ private:
     const CRGB crgb = CRGB(color_r, color_g, color_b);
     led_ctrl->fill_solid(crgb, range_start, range_size);
     led_ctrl->commit();
+  }
+
+  void handle_brightness() {
+    if (!doc["value"].is<int>()) {
+    serve_bad_request();
+      return;
+    }
+    uint8_t value = doc["value"] | 0;
+    led_ctrl->set_brightness(value);
+    api_response_success();
   }
 
   void handle_status() {
