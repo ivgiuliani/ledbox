@@ -48,6 +48,9 @@ public:
       Serial.println(server->uri());
     #endif
 
+    // Effectively disable CORS on every request.
+    server->sendHeader("Access-Control-Allow-Origin", "*");
+
     switch(shash(server->uri().c_str())) {
       case shash("/"):
         serve_static(PAGE_MAIN);
@@ -73,7 +76,6 @@ public:
       default:
         serve_static("Not Found", 404);
     }
-
   }
 
 private:
