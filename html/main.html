@@ -46,19 +46,25 @@
       data: JSON.stringify({ "op": "status" }),
       dataType: "json",
       success: function (data) {
-        console.log(data);
         $("#brightness_val").text(data["brightness"]);
         let lst = $("#leds");
-        lst.html("");
-        data["leds"].forEach(function (item) {
-          lst.append(`<li class="list-group-item led-item" style="background-color: ${item};">&nbsp;</li>`);
-        });
+        if (lst.children().length == 0) {
+          // First update, we need to create as many nodes as leds
+          data["leds"].forEach(function (item) {
+            lst.append(`<li class="list-group-item led-item" style="background-color: ${item};">&nbsp;</li>`);
+          });
+        } else {
+          // In subsequent updates just refresh the background color
+          data["leds"].forEach(function (item, idx) {
+            lst.children().eq(idx).css("background-color", item);
+          });
+        }
       },
       function(err) { console.log(err); }
     });
   }
 
-  setInterval(update, 100);
+  setInterval(update, 200);
 </script>
 
 </html>
