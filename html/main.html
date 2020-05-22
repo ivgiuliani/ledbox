@@ -9,26 +9,56 @@
     integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
   <title>LedBox</title>
+  <style>
+    .led-item {
+      padding: 2px !important;
+    }
+  </style>
 </head>
 
 <body>
   <div class="container">
-
+    <div class="row">
+      <div class="col">
+        Brightness
+      </div>
+      <div class="col">
+        <span id="brightness_val"></span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <ul class="list-group" id="leds">
+        </ul>
+      </div>
+    </div>
   </div>
 </body>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script type="text/javascript">
-  $.ajax({
-    type: "POST",
-    contentType: "application/json",
-    url: "/api",
-    data: JSON.stringify({ "op": "status" }),
-    dataType: "json",
-    success: function (data) { console.log(data); },
-    function(err) { console.log(err); }
-  });
+  function update() {
+    $.ajax({
+      type: "POST",
+      contentType: "application/json",
+      url: "/api",
+      data: JSON.stringify({ "op": "status" }),
+      dataType: "json",
+      success: function (data) {
+        console.log(data);
+        $("#brightness_val").text(data["brightness"]);
+        let lst = $("#leds");
+        lst.html("");
+        data["leds"].forEach(function (item) {
+          lst.append(`<li class="list-group-item led-item" style="background-color: ${item};">&nbsp;</li>`);
+        });
+      },
+      function(err) { console.log(err); }
+    });
+  }
+
+  setInterval(update, 100);
 </script>
 
 </html>
