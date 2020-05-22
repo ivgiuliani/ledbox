@@ -139,6 +139,7 @@ private:
           }
 
           server = new ESP8266WebServer(80);
+          server->onNotFound(std::bind(&LedWeb::handle_not_found, this));
           server->on("/", HTTP_GET, std::bind(&LedWeb::handle_request, this));
           server->on("/api", HTTP_POST, std::bind(&LedWeb::handle_request, this));
           server->begin();
@@ -164,6 +165,15 @@ private:
 
   void serve_bad_request() {
     serve_static("Bad Request", 400);
+  }
+
+  void handle_not_found() {
+    if (server->method() == HTTP_OPTIONS) {
+      // Disable CORS checks on not found as we don't have any other handler
+      // for HTTP_OPTIONS
+      send_cors_headers();
+      server->send(204);
+    }
   }
 
   void handle_api_request() {
@@ -197,6 +207,14 @@ private:
 
   inline void api_response_success() {
     serve_static("{ \"success\": true }", 200, "application/json");
+  }
+
+  inline void send_cors_headers() {
+    // We don't want CORS for a led strip...
+    server->sendHeader("Access-Control-Allow-Origin", "*");
+    server->sendHeader("Access-Control-Max-Age", "10000");
+    server->sendHeader("Access-Control-Allow-Methods", "PUT,POST,GET,OPTIONS");
+    server->sendHeader("Access-Control-Allow-Headers", "*");
   }
 
   void handle_fill_solid() {
