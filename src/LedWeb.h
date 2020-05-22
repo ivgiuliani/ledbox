@@ -56,7 +56,7 @@ public:
         serve_static(PAGE_MAIN);
         break;
       case shash("/api"):
-        // "plain" is a special argument in post request to access the raw body
+        // "plain" is a special argument in post requests to access the raw body
         if (server->hasArg("plain")) {
           const String body = server->arg("plain");
           DeserializationError err = deserializeJson(doc, body);
@@ -230,10 +230,11 @@ private:
 
     for (int16_t i = 0; i < led_ctrl->num_leds; i++) {
       const int32_t crgb =
-        (this->led_ctrl->leds[i].r << 16) +
-        (this->led_ctrl->leds[i].g << 8) +
+        (1 << 24) |
+        (this->led_ctrl->leds[i].r << 16) |
+        (this->led_ctrl->leds[i].g << 8) |
         this->led_ctrl->leds[i].b;
-      leds.add(String("#") + String(crgb, HEX));
+      leds.add(String("#") + String(crgb, HEX).substring(1));
     }
 
     String output;
