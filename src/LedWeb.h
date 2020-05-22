@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
+#include <ESP8266mDNS.h>
 #include <ArduinoJson.h>
 
 #include "MicroUtil.h"
@@ -129,6 +130,12 @@ private:
           if (server != NULL) {
             server->close();
             delete server;
+          }
+
+          if (!MDNS.begin(WIFI_HOSTNAME)) {
+            #ifdef ENABLE_SERIAL_DEBUG
+              Serial.println("Couldn't setup MDNS responder.");
+            #endif
           }
 
           server = new ESP8266WebServer(80);
