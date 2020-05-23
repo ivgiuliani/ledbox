@@ -16,10 +16,8 @@
 class LedControl {
 public:
   CRGB *leds;
-  const uint16_t num_leds;
 
-  LedControl(CRGB leds[], const uint16_t num_leds) :
-    leds(leds), num_leds(num_leds) {}
+  LedControl(CRGB leds[]) : leds(leds){}
 
   void set_brightness(uint8_t brightness) {
     this->brightness = brightness;
@@ -57,11 +55,11 @@ public:
    * strip.
    */
   inline void fill_solid(const CRGB color, uint8_t first = 0, uint8_t count = -1) {
-    if (count < 0) count = num_leds;
+    if (count < 0) count = NUM_LEDS;
 
     // Boundary checks: make sure we only fill ranges in 0..num_leds-1
-    first = first >= num_leds ? num_leds - 1 : first;
-    count = first + count > num_leds ? num_leds - first : count;
+    first = first >= NUM_LEDS ? NUM_LEDS - 1 : first;
+    count = first + count > NUM_LEDS ? NUM_LEDS - first : count;
 
     std::fill_n(&leds[first], count, color);
   }

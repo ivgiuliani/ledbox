@@ -190,7 +190,7 @@ private:
     uint16_t waveangle = ioff;
     uint16_t wavescale_half = (wavescale / 2) + 20;
 
-    for(uint16_t i = 0; i < control->num_leds; i++) {
+    for(uint16_t i = 0; i < NUM_LEDS; i++) {
       waveangle += 250;
 
       uint16_t s16 = sin16(waveangle) + 32768;
@@ -211,7 +211,7 @@ private:
     const uint8_t base_threshold = beatsin8(9, 55, 65);
     uint8_t wave = beat8(7);
 
-    for(uint16_t i = 0; i < control->num_leds; i++) {
+    for(uint16_t i = 0; i < NUM_LEDS; i++) {
       const uint8_t threshold = scale8(sin8(wave), 20) + base_threshold;
       const uint8_t avg_light = control->leds[i].getAverageLight();
       wave += 7;
@@ -227,7 +227,7 @@ private:
 
   // Deepen the blues and greens
   inline void deepen_colors() {
-    for(uint16_t i = 0; i < control->num_leds; i++) {
+    for(uint16_t i = 0; i < NUM_LEDS; i++) {
       control->leds[i].blue = scale8(control->leds[i].blue, 145);
       control->leds[i].green = scale8(control->leds[i].green, 200);
       control->leds[i] |= CRGB(2, 5, 7);

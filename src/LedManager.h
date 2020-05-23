@@ -9,8 +9,7 @@
 #include "LedControl.h"
 #include "LedAnim.h"
 
-template<uint16_t NUM_LEDS,
-         uint8_t DATA_PIN,
+template<uint8_t DATA_PIN,
          EOrder RGB_ORDER = GRB>
 class LedManager {
 public:
@@ -59,7 +58,7 @@ public:
 
 private:
   CRGB leds[NUM_LEDS];
-  LedControl control = LedControl(leds, NUM_LEDS);
+  LedControl control = LedControl(leds);
   LedAnim *current_animation;
 
   int8_t current_effect = AnimEffect::Initial;

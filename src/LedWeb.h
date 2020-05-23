@@ -219,7 +219,7 @@ private:
 
   void handle_fill_solid() {
     const int range_start = doc["range_start"] | 0;
-    const int range_size = doc["range_size"] | led_ctrl->num_leds;
+    const int range_size = doc["range_size"] | NUM_LEDS;
 
     if (!doc["color"].is<JsonArray>() || doc["color"].as<JsonArray>().size() != 3) {
       serve_bad_request();
@@ -253,7 +253,7 @@ private:
     response["brightness"] = led_ctrl->get_brightness();
     JsonArray leds = response.createNestedArray("leds");
 
-    for (int16_t i = 0; i < led_ctrl->num_leds; i++) {
+    for (int16_t i = 0; i < NUM_LEDS; i++) {
       const int32_t crgb =
         (1 << 24) |
         (this->led_ctrl->leds[i].r << 16) |
