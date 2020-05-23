@@ -14,7 +14,7 @@
 
 LedManager<DATA_PIN> led_manager;
 RotaryEncoder<D1, D2> encoder;
-ButtonCtrl<D3, HIGH, INPUT_PULLUP> encoder_button(1000);
+ButtonCtrl<D3, HIGH, INPUT_PULLUP> encoder_button(800);
 LedWeb led_web;
 
 void setup() {
