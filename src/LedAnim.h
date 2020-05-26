@@ -3,7 +3,6 @@
 
 #include <FastLED.h>
 #include "LedControl.h"
-#include "GammaCorrection.h"
 
 class LedAnim {
 public:
@@ -73,13 +72,13 @@ private:
   CRGB current_color;
 
   const std::vector<CRGB> rotation_colors = {
-    gc_rgb(CRGB::White),
-    gc_rgb(CRGB::Magenta),
-    gc_rgb(CRGB::Red),
-    gc_rgb(CRGB::Orange),
-    gc_rgb(CRGB::Lime), // Actually green
-    gc_rgb(CRGB::DeepSkyBlue),
-    gc_rgb(CRGB::Blue),
+    CRGB::White,
+    CRGB::Magenta,
+    CRGB::Red,
+    CRGB::Orange,
+    CRGB::Lime, // Actually green
+    CRGB::DeepSkyBlue,
+    CRGB::Blue,
   };
 };
 
