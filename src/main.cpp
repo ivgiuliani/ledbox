@@ -9,10 +9,9 @@
 #  error "NUM_LEDS must be defined at build time"
 #endif
 
-#define DATA_PIN D4 // GPIO2 aka D4
 #define LED_BRIGHTNESS_STEP_MULTIPLIER 5
 
-LedManager<DATA_PIN> led_manager;
+LedManager led_manager;
 RotaryEncoder<D1, D2> encoder;
 ButtonCtrl<D3, HIGH, INPUT_PULLUP> encoder_button(800);
 LedWeb led_web;

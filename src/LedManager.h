@@ -9,12 +9,10 @@
 #include "LedControl.h"
 #include "LedAnim.h"
 
-template<uint8_t DATA_PIN,
-         EOrder RGB_ORDER = GRB>
 class LedManager {
 public:
   LedManager() {
-    FastLED.addLeds<WS2812B, DATA_PIN, RGB_ORDER>(this->leds, NUM_LEDS).setCorrection(TypicalSMD5050);
+    FastLED.addLeds<WS2812B, DATA_PIN, GRB>(this->leds, NUM_LEDS).setCorrection(TypicalSMD5050);
 
     swap_animation(AnimEffect::Initial);
   };
