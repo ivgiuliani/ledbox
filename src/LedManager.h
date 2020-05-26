@@ -20,8 +20,8 @@ public:
   void begin() {
     control.set_brightness(0);
 
-    // The initial animation will have populated ever led with 'black'. Force a
-    // show so to avoid a "blink" from the strip when it's first powered up.
+    // The initial animation will have populated every led with 'black'. Force a
+    // show as to avoid a "blink" from the strip when it's first powered up.
     FastLED.show();
 
     swap_animation(AnimEffect::Solid);
