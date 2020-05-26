@@ -9,6 +9,7 @@
 
 #include "MicroUtil.h"
 #include "html/html.h"
+#include "LedManager.h"
 #include "LedControl.h"
 
 #define WIFI_HOSTNAME QUOTE(_WIFI_HOSTNAME)
@@ -31,8 +32,8 @@ class LedWeb {
 public:
   LedWeb() {};
 
-  void begin(LedControl *led_ctrl) {
-    this->led_ctrl = led_ctrl;
+  void begin(LedManager *led_mgr) {
+    this->led_mgr = led_mgr;
     wifi_setup();
   }
 
@@ -80,7 +81,7 @@ public:
   }
 
 private:
-  LedControl* led_ctrl = nullptr;
+  LedManager* led_mgr = nullptr;
   long last_connection_attempt = -1;
   bool connected = false;
 
@@ -232,8 +233,8 @@ private:
     const uint8_t color_b = color[2];
 
     const CRGB crgb = CRGB(color_r, color_g, color_b);
-    led_ctrl->fill_solid(crgb, range_start, range_size);
-    led_ctrl->commit();
+    led_mgr->get_control()->fill_solid(crgb, range_start, range_size);
+    led_mgr->get_control()->commit();
 
     api_response_success();
   }
@@ -244,11 +245,13 @@ private:
       return;
     }
     uint8_t value = doc["value"] | 0;
-    led_ctrl->set_brightness(value);
+    led_mgr->get_control()->set_brightness(value);
     api_response_success();
   }
 
   void handle_status() {
+    LedControl *led_ctrl = this->led_mgr->get_control();
+
     StaticJsonDocument<JSON_OBJECT_SIZE(2) + JSON_ARRAY_SIZE(60) + 60 * 8> response;
     response["brightness"] = led_ctrl->get_brightness();
     JsonArray leds = response.createNestedArray("leds");
@@ -256,9 +259,9 @@ private:
     for (int16_t i = 0; i < NUM_LEDS; i++) {
       const int32_t crgb =
         (1 << 24) |
-        (this->led_ctrl->leds[i].r << 16) |
-        (this->led_ctrl->leds[i].g << 8) |
-        this->led_ctrl->leds[i].b;
+        (led_ctrl->leds[i].r << 16) |
+        (led_ctrl->leds[i].g << 8) |
+        led_ctrl->leds[i].b;
       leds.add(String("#") + String(crgb, HEX).substring(1));
     }
 

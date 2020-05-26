@@ -25,7 +25,7 @@ void setup() {
   encoder.begin();
   encoder_button.begin();
   led_manager.begin();
-  led_web.begin(led_manager.get_control());
+  led_web.begin(&led_manager);
 
   Serial.println(F("System start OK."));
 }
