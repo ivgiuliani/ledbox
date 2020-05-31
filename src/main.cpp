@@ -9,7 +9,7 @@
 #  error "NUM_LEDS must be defined at build time"
 #endif
 
-#define LED_BRIGHTNESS_STEP_MULTIPLIER 5
+#define LED_BRIGHTNESS_STEP_MULTIPLIER 10
 
 LedManager led_manager;
 RotaryEncoder<D1, D2> encoder;
